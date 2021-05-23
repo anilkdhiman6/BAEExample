@@ -33,7 +33,7 @@ stages:
         inputs:
           azureSubscription: 'Free Trial(2bc5ea50-1ac3-4e14-8d64-69f2fc360272)'
           action: 'Create Or Update Resource Group'
-          resourceGroupName: 'BAETest-rg'
+          resourceGroupName: '$(resourceGroup)'
           location: 'UK South'
           templateLocation: 'Linked artifact'
           csmFile: 'BAETest-ArmTemplates\baetest-template.json'
