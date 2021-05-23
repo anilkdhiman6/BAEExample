@@ -13,7 +13,7 @@ resources:
   - repository: githubRepo
     type: github
     ref: '$(github_branch)'
-    endpoint: 'github.com_anilkdhiman6'
+    endpoint: 'anilkdhiman6'
     name: 'BAEExample'
 
 
