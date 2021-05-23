@@ -4,16 +4,7 @@ trigger:
 
 #--------------Variables---------------------------------------------------------
 variables:
-- group: Umbraco_Deploy_Env_Staging
-- name: BuildParameters.solution
-  value: '**\*.sln'
-- name: BuildParameters.ArtifactName
-  value: UmbrV1
-- name: BuildConfiguration
-  value: 'Release'
-- name: BuildPlatform
-  value:  'Any CPU'
-
+- group: BAETestVarGroup
 
 
 #--------------Resources---------------------------------------------------------
@@ -22,72 +13,30 @@ resources:
   - repository: githubRepo
     type: github
     ref: '$(github_branch)'
-    endpoint: 'github.com_anilkdhiman5'
-    name: 'wmcadigital/wmre-umbraco-cms'
+    endpoint: 'github.com_anilkdhiman6'
+    name: 'BAEExample'
 
 
 
 #--------------Stages---------------------------------------------------------
 stages:
 - stage: A
-  displayName: 'Create Umbraco Artifact'
+  displayName: 'Deploy resource to azure'
   jobs:
     - job: Job_A1
       displayName: Agent job A1
       pool:
         vmImage: vs2017-win2016
       steps:
-      - checkout: self
-      - script: 'dir D:\a\1\s\'
-      - task: CopyFiles@2
-        displayName: 'Copy Required File(s)' 
-        inputs:
-          contents: 'D:\a\1\s\WebCms\umbraco\SetDBConnectionString.ps1'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)'
-
       - checkout: githubRepo
-      - script: 'dir D:\a\1\s\WebCms\'
-      - task: AzurePowerShell@4
-        displayName: 'Set Db SqlClient Version'
+      - task: AzureResourceGroupDeployment@2
         inputs:
-          azureSubscription: '$(subscriptionName)'
-          ScriptPath: 'D:\a\1\s\WebCms\Database\SetDBConnectionString.ps1'
-          ScriptArguments: >-
-             -xmlFileName "D:\a\1\s\wmre-umbraco-cms\wmrecms.web\ConnectionStrings.config"
-             -serverName '$(servers_umbraco_name)'
-             -databaseName '$(servers_umbraco_name_db)'
-             -userId '$(sqladminlogin)'
-             -password '$(sqladminpassword)'
-          azurePowerShellVersion: LatestVersion
-
-      - task: NuGetToolInstaller@0
-        displayName: Use NuGet 4.4.1
-        inputs:
-          versionSpec: 4.4.1
-      - task: NuGetCommand@2
-        displayName: NuGet restore
-        inputs:
-          solution: $(BuildParameters.solution)
-      - task: VSBuild@1
-        displayName: Build solution
-        inputs:
-          solution: $(BuildParameters.solution)
-          msbuildArgs: /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"
-          platform: $(BuildPlatform)
-          configuration: $(BuildConfiguration)
-          clean: true
-    
-    #--------------Publish Jobs---------------------------------------------------------
-      - task: PublishSymbols@2
-        displayName: Publish symbols path
-        continueOnError: True
-        inputs:
-          SearchPattern: '**\bin\**\*.pdb'
-          PublishSymbols: false
-          SymbolServerType: TeamServices
-
-      - task: PublishPipelineArtifact@1
-        displayName: Publish Umbraco Pipeline Artifact
-        inputs:
-          targetPath: $(build.artifactstagingdirectory)
-          artifactName:  $(BuildParameters.ArtifactName)
+          azureSubscription: 'Free Trial(2bc5ea50-1ac3-4e14-8d64-69f2fc360272)'
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: 'BAETest-rg'
+          location: 'UK South'
+          templateLocation: 'Linked artifact'
+          csmFile: 'BAETest-ArmTemplates\baetest-template.json'
+          csmParametersFile: 'BAETest-ArmTemplates\baetest-parameters.json'
+          deploymentMode: 'Incremental'
+          deploymentOutputs: 'armoutputs'
