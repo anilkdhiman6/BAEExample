@@ -1,0 +1,146 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sites_fa_name": {
+      "defaultValue": "BAETest-fa",
+      "type": "String"
+    },
+    "serverfarms_ASP_externalid": {
+      "defaultValue": "ASP-BAETestrg-b9b5",
+      "type": "String"
+    },
+    "subscriptionId": {
+      "defaultValue": "2bc5ea50-1ac3-4e14-8d64-69f2fc360272",
+      "type": "String"
+    },
+    "resourceGroup": {
+      "defaultValue": "BAETest-rg",
+      "type": "String"
+    }
+
+  },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('sites_fa_name')]",
+            "location": "UK South",
+            "kind": "functionapp",
+          "properties": {
+            "enabled": true,
+            "hostNameSslStates": [
+              {
+                "name": "[concat(parameters('sites_fa_name'),'.azurewebsites.net')]",
+                "sslState": "Disabled",
+                "hostType": "Standard"
+              },
+              {
+                "name": "[concat(parameters('sites_fa_name'),'.scm.azurewebsites.net')]",
+                "sslState": "Disabled",
+                "hostType": "Repository"
+              }
+            ],
+            "serverFarmId": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('resourceGroup'),'/providers/Microsoft.Web/serverfarms/',parameters('serverfarms_ASP_externalid'))]",
+            "reserved": false,
+            "isXenon": false,
+            "hyperV": false,
+            "siteConfig": {},
+            "scmSiteAlsoStopped": false,
+            "clientAffinityEnabled": false,
+            "clientCertEnabled": false,
+            "hostNamesDisabled": false,
+            "containerSize": 1536,
+            "dailyMemoryTimeQuota": 0,
+            "httpsOnly": false,
+            "redundancyMode": "None"
+          }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_fa_name'), '/web')]",
+            "location": "UK South",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_fa_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$BAETest-fa",
+                "azureStorageAccounts": {},
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_fa_name'), '/', parameters('sites_fa_name'), '.azurewebsites.net')]",
+            "location": "UK South",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_fa_name'))]"
+            ],
+          "properties": {
+            "siteName": "[parameters('sites_fa_name')]",
+            "hostNameType": "Verified"
+          }
+        }
+    ]
+}
