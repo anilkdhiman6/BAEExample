@@ -12,9 +12,9 @@ resources:
   repositories:
   - repository: githubRepo
     type: github
-    ref: '$(github_branch)'
+    ref: 'master'
     endpoint: 'anilkdhiman6'
-    name: 'BAEExample'
+    name: 'anilkdhiman6/BAEExample'
 
 
 
