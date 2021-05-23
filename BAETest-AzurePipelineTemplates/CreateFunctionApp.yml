@@ -1,0 +1,28 @@
+parameters:
+  subscriptionName: ''
+  subscriptionId: ''
+  resourceGroup: ''
+  serverfarms_ASP_externalid: ''
+  sites_fa_name: ''
+
+jobs:
+  - job: JobFunctionAppResourceCreate
+    displayName: CreateOrUpdateFunctionApp
+    pool:
+        vmImage: vs2017-win2016
+    steps:  
+      - checkout: githubRepo 
+      - task: AzureResourceGroupDeployment@2
+        displayName: 'Create or Update Function App Resource'
+        inputs:
+          azureSubscription: '${{ parameters.subscriptionName }}'
+          resourceGroupName: '${{ parameters.resourceGroup }}'
+          location: 'UK South'
+          csmFile: 'BAETest-ArmTemplates\baetest-template.json'
+          csmParametersFile: 'BAETest-ArmTemplates\baetest-parameters.json'
+          overrideParameters: >-
+            -sites_fa_name "${{ parameters.sites_fa_name }}"
+            -serverfarms_ASP_externalid "${{ parameters.serverfarms_ASP_externalid }}"
+            -subscriptionId "${{ parameters.subscriptionId }}"
+            -resourceGroup "${{ parameters.resourceGroup }}"
+          deploymentOutputs: armoutputs

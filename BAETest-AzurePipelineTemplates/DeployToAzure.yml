@@ -1,10 +1,8 @@
 trigger:
 - none
 
-
-#--------------Variables---------------------------------------------------------
 variables:
-- group: BAETestVarGroup
+- group: 'BAETestVarGroup'
 
 
 #--------------Resources---------------------------------------------------------
@@ -17,26 +15,15 @@ resources:
     name: 'anilkdhiman6/BAEExample'
 
 
-
 #--------------Stages---------------------------------------------------------
 stages:
 - stage: A
-  displayName: 'Deploy resource to azure'
+  displayName: 'Build SMS Router Environment A'
   jobs:
-    - job: Job_A1
-      displayName: Agent job A1
-      pool:
-        vmImage: vs2017-win2016
-      steps:
-      - checkout: githubRepo
-      - task: AzureResourceGroupDeployment@2
-        inputs:
-          azureSubscription: 'Free Trial(2bc5ea50-1ac3-4e14-8d64-69f2fc360272)'
-          action: 'Create Or Update Resource Group'
-          resourceGroupName: 'BAETest-rg'
-          location: 'UK South'
-          templateLocation: 'Linked artifact'
-          csmFile: 'BAETest-ArmTemplates\baetest-template.json'
-          csmParametersFile: 'BAETest-ArmTemplates\baetest-parameters.json'
-          deploymentMode: 'Incremental'
-          deploymentOutputs: 'armoutputs'
+  - template: CreateFunctionApp.yml
+    parameters:
+        subscriptionName: '$(subscriptionName)'
+        subscriptionId: '$(subscriptionId)'
+        resourceGroup: '$(resourcegroupname)'
+        serverfarms_ASP_externalid: '$(serverfarms_ASP_externalid)'
+        sites_fa_name: '$(sites_fa_name)'
